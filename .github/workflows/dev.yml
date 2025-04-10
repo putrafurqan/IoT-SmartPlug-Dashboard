@@ -17,8 +17,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/putrafurqan/IoT-SmartPlug-Dashboard:latest .
+          docker build -t ghcr.io/putrafurqan/iot_smartplug_dashboard:latest .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/putrafurqan/IoT-SmartPlug-Dashboard:latest
+          docker push ghcr.io/putrafurqan/iot_smartplug_dashboard:latest
