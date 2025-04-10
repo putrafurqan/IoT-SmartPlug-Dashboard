@@ -1,0 +1,48 @@
+name: Build and Deploy PHP Web Server via Tailscale
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ secrets.GITHUB_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ secrets.GITHUB_USERNAME }}/${{ secrets.REPO_NAME }}:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ secrets.GITHUB_USERNAME }}/${{ secrets.REPO_NAME }}:latest
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          tags: tag:ci
+          use-cache: 'true'
+
+      - name: SSH and deploy on home server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << EOF
+            echo "🔑 Logging into GHCR"
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ secrets.GITHUB_USERNAME }} --password-stdin
+
+            echo "📦 Pulling latest image"
+            docker pull ghcr.io/${{ secrets.GITHUB_USERNAME }}/${{ secrets.REPO_NAME }}:latest
+
+            echo "🧹 Cleaning up old container"
+            docker stop php-server || true
+            docker rm php-server || true
+
+            echo "🚀 Starting container"
+            docker run -d --name php-server -p 8080:80 ghcr.io/${{ secrets.GITHUB_USERNAME }}/${{ secrets.REPO_NAME }}:latest
+          EOF
