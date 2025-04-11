@@ -1,0 +1,17 @@
+name: 'Tailscale Setup Action'
+description: 'Log in to Tailscale using OAuth credentials'
+
+inputs:
+  oauth-client-id:
+    description: 'OAuth Client ID'
+    required: true
+  oauth-secret:
+    description: 'OAuth Secret'
+    required: true
+  tags:
+    description: 'Tailscale Tags (optional)'
+    required: false
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
