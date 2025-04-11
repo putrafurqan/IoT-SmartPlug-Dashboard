@@ -23,23 +23,9 @@ jobs:
         run: |
           docker push ghcr.io/putrafurqan/iot_smartplug_dashboard:latest
 
-      - name: Tailscale Action
-        uses: ./
-        with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tags: tag:ci
-
-      - name: Check for Tailscale connection
-        shell: bash
-        run: |
-          tailscale status -json | jq -r .BackendState | grep -q Running
-
-      - name: Ensure no dirty files from Tailscale Action remain
-        shell: bash
-        run: |
-          extra_files=$(git ls-files . --exclude-standard --others)
-          if [ ! -z "$extra_files" ]; then
-            echo "::error::Unexpected extra files: $extra_files"
-            exit 1
-          fi
+      - name: Tailscale
+      uses: tailscale/github-action@v3
+      with:
+        oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+        oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+        tags: tag:ci
