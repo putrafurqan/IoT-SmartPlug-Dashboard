@@ -113,7 +113,7 @@
     }
 
     updateDashboard();
-    setInterval(updateDashboard, 10); // Refresh every 5 seconds
+    setInterval(updateDashboard, 60000); // Refresh every 5 seconds
   </script>
 
 </body>
