@@ -69,7 +69,7 @@
 </head>
 <body>
 
-  <h1>🌐 IoT Smartplug Dashboard</h1>
+  <h1>IoT Smartplug Dashboard</h1>
 
   <div class="dashboard">
     <div class="card">
@@ -92,7 +92,7 @@
   </div>
 
   <footer>
-    &copy; <?php echo date("Y"); ?> IoT Dashboard by Furqan 🚀
+    &copy; <?php echo date("Y"); ?> EMS Dashboard Prototyping
   </footer>
 
   <script>
@@ -113,7 +113,7 @@
     }
 
     updateDashboard();
-    setInterval(updateDashboard, 5000); // Refresh every 5 seconds
+    setInterval(updateDashboard, 10); // Refresh every 5 seconds
   </script>
 
 </body>
