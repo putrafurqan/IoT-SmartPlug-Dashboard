@@ -1,3 +1,28 @@
+<?php
+// Database credentials
+$host = 'db'; // service name in docker-compose
+$db   = 'iot_dashboard';
+$user = 'iotuser';
+$pass = 'iotpass';
+
+try {
+    // Create PDO connection
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Fetch latest sensor data
+    $stmt = $pdo->query("SELECT * FROM sensor_data ORDER BY timestamp DESC LIMIT 1");
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $data = [
+        'temperature' => '--',
+        'humidity' => '--',
+        'power_usage' => '--',
+        'timestamp' => 'DB connection failed'
+    ];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,47 +99,26 @@
   <div class="dashboard">
     <div class="card">
       <h2>Temperature</h2>
-      <div class="value" id="temp">-- °C</div>
-      <div class="timestamp" id="temp-time">Updated just now</div>
+      <div class="value"><?= htmlspecialchars($data['temperature']) ?> °C</div>
+      <div class="timestamp">Updated at <?= htmlspecialchars($data['timestamp']) ?></div>
     </div>
 
     <div class="card">
       <h2>Humidity</h2>
-      <div class="value" id="humidity">-- %</div>
-      <div class="timestamp" id="humidity-time">Updated just now</div>
+      <div class="value"><?= htmlspecialchars($data['humidity']) ?> %</div>
+      <div class="timestamp">Updated at <?= htmlspecialchars($data['timestamp']) ?></div>
     </div>
 
     <div class="card">
       <h2>Power Usage</h2>
-      <div class="value" id="power">-- W</div>
-      <div class="timestamp" id="power-time">Updated just now</div>
+      <div class="value"><?= htmlspecialchars($data['power_usage']) ?> W</div>
+      <div class="timestamp">Updated at <?= htmlspecialchars($data['timestamp']) ?></div>
     </div>
   </div>
 
   <footer>
-    &copy; <?php echo date("Y"); ?> EMS Dashboard Prototyping
+    &copy; <?= date("Y") ?> EMS Dashboard Prototyping
   </footer>
-
-  <script>
-    // Simulate real-time values (replace this with AJAX/fetch for live data)
-    function getRandom(min, max) {
-      return (Math.random() * (max - min) + min).toFixed(1);
-    }
-
-    function updateDashboard() {
-      document.getElementById('temp').textContent = `${getRandom(20, 30)} °C`;
-      document.getElementById('humidity').textContent = `${getRandom(40, 60)} %`;
-      document.getElementById('power').textContent = `${getRandom(50, 150)} W`;
-
-      const now = new Date().toLocaleTimeString();
-      document.getElementById('temp-time').textContent = `Updated at ${now}`;
-      document.getElementById('humidity-time').textContent = `Updated at ${now}`;
-      document.getElementById('power-time').textContent = `Updated at ${now}`;
-    }
-
-    updateDashboard();
-    setInterval(updateDashboard, 60000); // Refresh every 5 seconds
-  </script>
 
 </body>
 </html>
